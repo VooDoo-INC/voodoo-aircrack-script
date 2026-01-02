@@ -18,7 +18,7 @@ Required packages:
 
 Installation:
 ```
-git clone https://github.com/RomanLivik/voodoo-aircrack-script.git
+git clone https://github.com/VooDoo-INC/voodoo-aircrack-script.git
 ```
 Launch:
 ```
