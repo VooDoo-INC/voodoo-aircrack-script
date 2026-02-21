@@ -1,33 +1,21 @@
+iface = None
 import subprocess
 import os
 import sys
-from time import sleep
 
 def run_command(cmd):
     try:
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError as e:
-        print(f"Error: {e}")
-
-class Colors:
-    """Colors for terminal output"""
-    HEADER = '\033[95m'
-    BLUE = '\033[94m'
-    CYAN = '\033[96m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    RED = '\033[91m'
-    END = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+        if e.stderr:
+            print(f"Error: {e}")
 
 def clear_screen():
     os.system('clear' if os.name == 'posix' else 'cls')
 
 def banner():
     clear_screen()
-    banner = f"""{Colors.RED}
-
+    banner = f"""
  ██▒   █▓ ▒█████   ▒█████  ▓█████▄  ▒█████   ▒█████  
 ▓██░   █▒▒██▒  ██▒▒██▒  ██▒▒██▀ ██▌▒██▒  ██▒▒██▒  ██▒
  ▓██  █▒░▒██░  ██▒▒██░  ██▒░██   █▌▒██░  ██▒▒██░  ██▒
@@ -41,80 +29,137 @@ def banner():
 """
     print(banner)
 
+##############################
+### SIMPLIFIZING FUNCTIONS ###
+##############################
+
+def ask_iface():
+    global iface
+    result = subprocess.run(["iw", "dev"], capture_output=True, text=True)
+    ifaces = []
+    for line in result.stdout.splitlines():
+        line = line.strip()
+        if line.startswith("Interface"):
+            ifaces.append(line.split()[1])
+    if not ifaces:
+        print("No wireless interfaces found. Exiting.")
+        sys.exit(1)
+    if len(ifaces) == 1:
+        iface = ifaces[0]
+        print(f"Found interface: {iface}")
+    else:
+        print("Available interfaces:")
+        for i, name in enumerate(ifaces):
+            print(f"  {i+1}. {name}")
+        choice = input(f"Select interface (Enter for {ifaces[0]}): ").strip()
+        if choice == "":
+            iface = ifaces[0]
+        elif choice.isdigit() and 1 <= int(choice) <= len(ifaces):
+            iface = ifaces[int(choice) - 1]
+        else:
+            iface = choice
+    check = subprocess.run(["iwconfig", iface], capture_output=True, text=True)
+    if "Mode:Monitor" in check.stdout:
+        print(f"{iface} already in monitor mode.")
+        iface = iface
+    else:
+        print(f"Enabling monitor mode on {iface}...")
+        subprocess.run(["sudo", "airmon-ng", "start", iface], check=True)
+        mon_iface = iface + "mon"
+        check_mon = subprocess.run(["iwconfig", mon_iface], capture_output=True, text=True)
+        if "Mode:Monitor" in check_mon.stdout:
+            print(f"Monitor interface: {mon_iface}")
+            iface = mon_iface
+        else:
+            iface = iface
+            print(f"Monitor interface: {iface}")
+    return iface
+
+def exit_cluster():
+    global iface
+    print(f"Disabling monitor mode on {iface}...")
+    subprocess.run(["sudo", "airmon-ng", "stop", iface])
+    print("Exit...")
+    sys.exit(0)
+
+####################
+### MAIN BACKEND ###
+####################
 
 def show_main_menu():
-    print ("""
-╭─────────────────╮
-│      MAIN       │
-│1. airmon-ng     │
-│2. airodump-ng   │
-│3. areplay-ng    │
-│4. exit          │
-╰─────────────────╯
-""")
-    choice = input("Select (1/2/3/4): ")
-    return choice
-
-def airmon_ng_menu():
     while True:
-        print("""
-╭─────────────────╮
-│     AIRMON      │
-│1. list Ifaces   │
-│2. enable mon    │
-│3. disable mon   │
-│4. exit          │
-╰─────────────────╯
-""")
-        choice = input("Select (1/2/3/4): ")
-        if choice == "1":
-            subprocess.run(["sudo", "airmon-ng"])
-        elif choice == "2":
-            iface = input("Enter Interface: ")
-            subprocess.run(["sudo", "airmon-ng", "start", iface])
-        elif choice == "3":
-            iface = input("Enter Interface: ")
-            subprocess.run(["sudo", "airmon-ng", "stop", iface])
-        elif choice == "4":
-            break
-
-def airodump_ng_menu():
-    while True:
+        banner()
         print ("""
 ╭─────────────────╮
-│    AIRODUMP     │
-│1. scan around   │
-│2. scan target   │
+│      MAIN       │
+│1. airodump-ng   │
+│2. areplay-ng    │
+│                 │
 │3. exit          │
 ╰─────────────────╯
 """)
         choice = input("Select (1/2/3): ")
         if choice == "1":
-            iface = input("Enter Interface: ")
+            airodump_ng_menu()
+        if choice == "2":
+            aireplay_ng_menu()
+        if choice == "3":
+            exit_cluster()
+        else:
+            break
+
+def airodump_ng_menu():
+    while True:
+        banner()
+        print ("""
+╭─────────────────╮
+│    AIRODUMP     │
+│1. scan around   │
+│2. scan target   │
+│3. scan channel  │
+│4. exit          │
+╰─────────────────╯
+""")
+        choice = input("Select (1/2/3): ")
+        if choice == "1":
             try:
                 subprocess.run(["sudo", "airodump-ng", iface], check=True)
                 if KeyboardInterrupt:
-                    return main()
+                    kbenter = input("Press Enter to continue: ")
+                    if kbenter == "":
+                        return airodump_ng_menu()
             except subprocess.CalledProcessError:
-                print("Interrupted by user...")
+                print("Error: ")
         elif choice == "2":
-            iface = input("Enter Interface: ")
             bssid = input("Enter BSSID: ")
             channel = input("Enter channel: ")
             try:
                 subprocess.run(["sudo", "airodump-ng", "--bssid", bssid, "--channel", channel, iface], check=True)
                 if KeyboardInterrupt:
-                    return main()
+                    kbenter = input("Press Enter to continue: ")
+                    if kbenter == "":
+                        return airodump_ng_menu()
             except subprocess.CalledProcessError:
-                print("Interrupted by user...")
+                print("Error: ")
         elif choice == "3":
-            break
+            channel = input("Enter Channel: ")
+            try:
+                subprocess.run(["sudo", "airodump-ng", "--channel", channel, iface], check=True)
+                if KeyboardInterrupt:
+                    kbenter = input("Press Enter to continue: ")
+                    if kbenter == "":
+                        return airodump_ng_menu()
+            except subprocess.CalledProcessError as e:
+                if e.stderr:
+                    print(f"{e.stderr}")
+        elif choice == "4":
+            return main_askless()
 
 def aireplay_ng_menu():
-    while True:
+        banner()
         print ("""
 ╭──────────────────╮
-│$   AIREPLAY      │
+│     AIREPLAY     │
 │1. deauth attack  │
 │2. fakeauth attack│
 │3. exit           │
@@ -122,38 +167,44 @@ def aireplay_ng_menu():
 """)
         choice = input("Select (1/2/3): ")
         if choice == "1":
-            iface = input("Enter interface: ")
             bssid = input("Enter BSSID: ")
             client = input("Enter client MAC (nothing for skip): ")
             print("PS: '0' in count of packets means u'll send packets until u interrupt the attack")
-            sleep(1)
             count = input("Enter your count of packets (default 0): ") or "0"
             cmd = ["sudo", "aireplay-ng", "--deauth", count, "-a", bssid, iface]
             if client:
                 cmd.extend(["-c", client])
             run_command(cmd)
-        elif choice == "2":
-            iface = input("Enter Interface: ")
+            if KeyboardInterrupt:
+                print("\n")
+                input("Press Enter to continue:")
+                return aireplay_ng_menu()
+        if choice == "2":
             bssid = input("Enter BSSID: ")
             subprocess.run(["sudo", "aireplay-ng", "--fakeauth", "0", "-a", bssid, iface])
-        elif choice == "3":
-            break
+            if KeyboardInterrupt:
+                input("Press Enter to continue: ")
+                return aireplay_ng_menu()
+        if choice == "3":
+            return main_askless()
+
+#####################
+### LAUNCH SECTOR ###
+#####################
+
+def main_askless():
+        choice = show_main_menu()
 
 def main():
-    while True:
-        choice = show_main_menu()
-        if choice == "1":
-            airmon_ng_menu()
-        elif choice == "2":
-            airodump_ng_menu()
-        elif choice == "3":
-            aireplay_ng_menu()
-        elif choice == "4":
-            print("Exit...")
-            break
-        else:
-            print("Wrong pick, try again.")
+    if os.getuid() != 0:
+        print("RUN ME AS ROOT!")
+        sys.exit(1)
+    ask_iface()
+    choice = show_main_menu()
 
 if __name__ == "__main__":
-    banner()
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nExiting by a hotkey.")
+        exit_cluster()
