@@ -3,7 +3,6 @@
 
 <img width="521" height="468" alt="изображение" src="https://github.com/user-attachments/assets/52dfcd12-5449-43df-9e59-448690a48bb4" />
 
-
 <img width="503" height="431" alt="Вставленное изображение (3)" src="https://github.com/user-attachments/assets/38d7f72d-bebf-43e5-92bc-3c417e9158ec" />
 
 
@@ -20,10 +19,10 @@ Attacks via aireplay are conducted only during active scanning of the selected a
 * Airmon-ng had been delated
 * Code has been restructured. Now it is prettier than last code
 
-Requirements:
-1. Linux
-2. Superuser privileges (run with sudo)
-3. Wireless adapter supporting monitor mode
+## Requirements:
+* Linux
+*  Superuser privileges (run with sudo)
+*   Wireless adapter supporting monitor mode
 
 ## Required packages:
 1. Python3
