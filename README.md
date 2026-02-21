@@ -1,7 +1,8 @@
 
 <img width="550" height="467" alt="Вставленное изображение" src="https://github.com/user-attachments/assets/90e970d2-8eac-4e87-91da-bcc8761740d2" />
 
-<img width="517" height="459" alt="Вставленное изображение (2)" src="https://github.com/user-attachments/assets/a5743253-b364-4121-abe4-663b5b640215" />
+<img width="521" height="468" alt="изображение" src="https://github.com/user-attachments/assets/52dfcd12-5449-43df-9e59-448690a48bb4" />
+
 
 <img width="503" height="431" alt="Вставленное изображение (3)" src="https://github.com/user-attachments/assets/38d7f72d-bebf-43e5-92bc-3c417e9158ec" />
 
