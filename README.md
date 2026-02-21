@@ -1,4 +1,9 @@
-![preview](https://github.com/user-attachments/assets/375f08a9-cd46-47e0-acce-205dba44dc9d)
+
+<img width="550" height="467" alt="Вставленное изображение" src="https://github.com/user-attachments/assets/90e970d2-8eac-4e87-91da-bcc8761740d2" />
+
+<img width="517" height="459" alt="Вставленное изображение (2)" src="https://github.com/user-attachments/assets/a5743253-b364-4121-abe4-663b5b640215" />
+
+<img width="503" height="431" alt="Вставленное изображение (3)" src="https://github.com/user-attachments/assets/38d7f72d-bebf-43e5-92bc-3c417e9158ec" />
 
 
 Python script for semi-automating work with the aircrack-ng suite of utilities via a convenient text-based menu. The script features a CLI interface, enabling seamless interaction with the almost all aircrack-ng functionality for both advanced users and beginners.
