@@ -120,7 +120,7 @@ def airodump_ng_menu():
 │4. exit          │
 ╰─────────────────╯
 """)
-        choice = input("Select (1/2/3): ")
+        choice = input("Select (1/2/3/4): ")
         if choice == "1":
             try:
                 subprocess.run(["sudo", "airodump-ng", iface], check=True)
