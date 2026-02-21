@@ -13,6 +13,13 @@ This script is intended exclusively for testing the security of one's own networ
 
 Attacks via aireplay are conducted only during active scanning of the selected access point. To perform this, execute the attack in a second terminal window while maintaining active scanning in the first window.
 
+## The script tested on
+* Arch linux
+* Kali linux
+* All arch based distros
+
+> It is not working on MacOS. Please, understand it before installation on your mac
+
 ## Last global update: 
 * Added automatical power on monitor mode after launch of the script
 * Added channel-scan mode
