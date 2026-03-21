@@ -21,7 +21,7 @@ Attacks via aireplay are conducted only during active scanning of the selected a
 * Kali linux
 * All arch based distros
 
-> It is not working on MacOS. Please, understand it before installation on your mac
+> It is not working on MacOS. Please, understand it before instаllation on your mac
 
 ## Last global update: 
 * Added automatical power on monitor mode after launch of the script
