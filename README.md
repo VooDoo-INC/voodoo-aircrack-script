@@ -9,6 +9,9 @@
 Python script for semi-automating work with the aircrack-ng suite of utilities via a convenient text-based menu. The script features a CLI interface, enabling seamless interaction with the almost all aircrack-ng functionality for both advanced users and beginners.
 
 ## Attention
+
+> On Gentoo Openrc it is nit worcing correctly. Please understand it before installation
+
 This script is intended exclusively for testing the security of one's own networks or networks for which official authorization has been obtained. Use for any other purposes may be illegal in your jurisdiction.
 
 Attacks via aireplay are conducted only during active scanning of the selected access point. To perform this, execute the attack in a second terminal window while maintaining active scanning in the first window.
